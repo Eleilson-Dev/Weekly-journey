@@ -1,5 +1,3 @@
-const tableTasks = document.querySelector(".table_tasks");
-
 const tasksOfMyDay = [
   { id: "task-1", activity: "Refeições", hours_per_day: 3, hours_per_week: 18 },
   { id: "task-2", activity: "Trabalho", hours_per_day: 8, hours_per_week: 45 },
@@ -8,48 +6,57 @@ const tasksOfMyDay = [
   { id: "task-5", activity: "Dormir", hours_per_day: 7, hours_per_week: 42 },
 ];
 
-const createTableRow = (task) => {
-  const tableBody = document.createElement("tbody");
+class ModelRoutine {
+  constructor(tasksOfMyDay) {
+    this.tasksOfMyDay = tasksOfMyDay;
+    this.tableTasks = document.querySelector(".table_tasks");
+    this.tableBody = document.createElement("tbody");
+    this.graficsConteiner = document.querySelector(".grafics");
+  }
 
-  const trTemplate = `
-  <tr>
-    <td>${task.activity}</td>
-    <td>${task.hours_per_day}h</td>
-    <td>${task.hours_per_week}h</td>
-  </tr>
-  `;
+  init() {
+    this.addTasksToTable();
+  }
 
-  tableBody.innerHTML = trTemplate;
-  tableTasks.appendChild(tableBody);
-};
+  createTableRow(task) {
+    const trTemplate = document.createElement("tr");
+    trTemplate.innerHTML = `
+      <tr>
+        <td>${task.activity}</td>
+        <td>${task.hours_per_day}h</td>
+        <td>${task.hours_per_week}h</td>
+      </tr>
+    `;
+    this.tableBody.appendChild(trTemplate);
+    this.tableTasks.appendChild(this.tableBody);
+  }
 
-const createGrafics = (task) => {
-  const graficsConteiner = document.querySelector(".grafics");
-  const grafic = `
-    <div class="grafic_column">
-    <span>${task.activity}</span>
-    <div class="percent" id=${task.id}></div>
-    </div>
-  `;
+  createGrafics(task) {
+    const grafic = `
+      <div class="grafic_column">
+        <span>${task.activity}</span>
+        <div class="percent" id=${task.id}></div>
+      </div>
+    `;
+    this.graficsConteiner.innerHTML += grafic;
+  }
 
-  graficsConteiner.innerHTML += grafic;
-};
+  fillingTheGraph(task) {
+    const percent = document.querySelector(`#${task.id}`);
+    const porcentagemDeHoras = (task.hours_per_day / 8) * 100;
+    const porcentagemDeHorasEmPX = (porcentagemDeHoras.toFixed(1) / 100) * 400;
 
-const fillingTheGraph = (task) => {
-  const percent = document.querySelector(`#${task.id}`);
+    percent.style.height = `${porcentagemDeHorasEmPX}px`;
+  }
 
-  const porcentagemDeHoras = (task.hours_per_day / 8) * 100;
-  const porcentagemDeHorasEmPX = (porcentagemDeHoras.toFixed(1) / 100) * 400;
+  addTasksToTable() {
+    this.tasksOfMyDay.forEach((task) => {
+      this.createTableRow(task);
+      this.createGrafics(task);
+      this.fillingTheGraph(task);
+    });
+  }
+}
 
-  percent.style.height = `${porcentagemDeHorasEmPX}px`;
-};
-
-const addTasksToTable = () => {
-  tasksOfMyDay.forEach((task) => {
-    createTableRow(task);
-    createGrafics(task);
-    fillingTheGraph(task);
-  });
-};
-
-addTasksToTable();
+const modelRoutine = new ModelRoutine(tasksOfMyDay);
+modelRoutine.init();
